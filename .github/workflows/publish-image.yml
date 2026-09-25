@@ -2,7 +2,9 @@ name: Publish image
 
 on:
   push:
-    branches: [main]
+    branches:
+      - main
+      - release/**
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -36,6 +38,6 @@ jobs:
           push: true
           tags: |
             ${{ env.IMAGE }}:sha-${{ github.sha }}
-            ${{ env.IMAGE }}:dev
+            ${{ github.ref == 'refs/heads/main' && format('{0}:dev', env.IMAGE) || '' }}
           labels: |
             org.opencontainers.image.source=https://github.com/${{ github.repository }}
