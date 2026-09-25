@@ -1,5 +1,5 @@
 name: Release image
-run-name: Release image from ${{ github.sha }}
+run-name: Release image from ${{ github.ref_name }} at ${{ github.sha }}
 
 on:
   workflow_dispatch:
@@ -16,13 +16,6 @@ jobs:
       contents: write
       packages: write
     steps:
-      - name: Require main branch
-        run: |
-          if [[ "$GITHUB_REF" != "refs/heads/main" ]]; then
-            echo "::error::Run this workflow from the main branch."
-            exit 1
-          fi
-
       - name: Check out release commit
         uses: actions/checkout@v6
         with:
