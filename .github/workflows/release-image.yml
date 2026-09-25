@@ -46,10 +46,10 @@ jobs:
           fi
 
           {
-            echo "version=$version"
             echo "git_tag=$version"
-            echo "source=$image:sha-$GITHUB_SHA"
-            echo "target=$image:$version"
+            echo "commit=$image:sha-$GITHUB_SHA"
+            echo "version=$image:$version"
+            echo "prod=$image:prod"
           } >> "$GITHUB_OUTPUT"
 
       - name: Log in to GHCR
@@ -63,13 +63,14 @@ jobs:
         uses: docker/setup-buildx-action@v4
 
       - name: Verify release candidate
-        run: docker buildx imagetools inspect "${{ steps.release.outputs.source }}"
+        run: docker buildx imagetools inspect "${{ steps.release.outputs.commit }}"
 
-      - name: Add version tag to image
+      - name: Promote image to production
         run: >-
           docker buildx imagetools create
-          --tag "${{ steps.release.outputs.target }}"
-          "${{ steps.release.outputs.source }}"
+          --tag "${{ steps.release.outputs.version }}"
+          --tag "${{ steps.release.outputs.prod }}"
+          "${{ steps.release.outputs.commit }}"
 
       - name: Create Git tag and GitHub Release
         env:
@@ -78,5 +79,5 @@ jobs:
           gh release create "${{ steps.release.outputs.git_tag }}"
           --repo "$GITHUB_REPOSITORY"
           --target "$GITHUB_SHA"
-          --title "${{ steps.release.outputs.version }}"
+          --title "${{ steps.release.outputs.git_tag }}"
           --generate-notes
