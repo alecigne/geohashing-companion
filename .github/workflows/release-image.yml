@@ -68,6 +68,7 @@ jobs:
       - name: Promote image to production
         run: >-
           docker buildx imagetools create
+          --prefer-index=false
           --tag "${{ steps.release.outputs.version }}"
           --tag "${{ steps.release.outputs.prod }}"
           "${{ steps.release.outputs.commit }}"
